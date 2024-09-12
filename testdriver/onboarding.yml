@@ -1,0 +1,108 @@
+version: 4.0.31
+steps:
+  - prompt: click the right arrow in arc browser
+    commands:
+      - command: focus-application
+        name: Arc
+      - command: hover-image
+        description: right arrow button in the Arc browser
+        action: click
+  - prompt: fill out this form with fake information
+    commands:
+      - command: hover-text
+        text: Name
+        description: name field in the form
+        action: click
+      - command: type
+        text: John Doe
+      - command: hover-text
+        text: Email
+        description: email field in the form
+        action: click
+      - command: type
+        text: johndoe@example.com
+      - command: hover-text
+        text: Password
+        description: password field in the form
+        action: click
+      - command: type
+        text: FakePassword123
+      - command: hover-text
+        text: Confirm Password
+        description: confirm password field in the form
+        action: click
+      - command: type
+        text: FakePassword123
+      - command: match-image
+        path: tos.png
+        action: click
+      - command: hover-text
+        text: Create an Account
+        description: create an account button
+        action: click
+  - prompt: click on "no, i want to type"
+    commands:
+      - command: focus-application
+        name: Arc
+      - command: hover-text
+        text: No, I want to type
+        description: option to type in all passwords again
+        action: click
+  - prompt: click on "no, i want to type"
+    commands:
+      - command: hover-text
+        text: No, I want to type in all my passwords again
+        description: option to type passwords manually
+        action: click
+  - prompt: click next
+    commands:
+      - command: focus-application
+        name: Arc
+      - command: hover-text
+        text: Next
+        description: button to proceed
+        action: click
+  - prompt: enable arc max
+    commands:
+      - command: focus-application
+        name: Arc
+      - command: hover-text
+        text: Enable Arc Max
+        description: button to enable Arc Max
+        action: click
+  - prompt: click next
+    commands:
+      - command: focus-application
+        name: Arc
+      - command: hover-text
+        text: Next
+        description: button to proceed
+        action: click
+  - prompt: click next
+    commands:
+      - command: assert
+        expect: that the windows control panel showed up
+  - prompt: click set default in windows control panel
+    commands:
+      - command: focus-application
+        name: Settings
+      - command: hover-text
+        text: Set default
+        description: button to make Arc the default browser
+        action: click
+  - prompt: focus arc again
+    commands:
+      - command: focus-application
+        name: Arc
+  - prompt: click get started
+    commands:
+      - command: focus-application
+        name: Arc
+      - command: hover-text
+        text: Get Started
+        description: button to get started in Arc
+        action: click
+  - prompt: click get started
+    commands:
+      - command: assert
+        expect: that arc browser launched
