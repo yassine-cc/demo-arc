@@ -81,15 +81,7 @@ steps:
   - prompt: click next
     commands:
       - command: assert
-        expect: that the windows control panel showed up
-  - prompt: click set default in windows control panel
-    commands:
-      - command: focus-application
-        name: Settings
-      - command: hover-text
-        text: Set default
-        description: button to make Arc the default browser
-        action: click
+        expect: default app selection shows up
   - prompt: focus arc again
     commands:
       - command: focus-application
