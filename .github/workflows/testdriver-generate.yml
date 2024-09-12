@@ -35,6 +35,13 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
+      
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "placeholder@testdriver.ai"
+          replace: "${{ github.run_id }}-${{ github.run_attempt }}"
+          regex: false
 
       - name: Display filename being tested
         run: |

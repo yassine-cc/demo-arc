@@ -20,7 +20,7 @@ steps:
         description: email field in the form
         action: click
       - command: type
-        text: johndoe@example.com
+        text: placeholder@testdriver.ai
       - command: hover-text
         text: Password
         description: password field in the form
