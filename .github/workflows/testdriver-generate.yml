@@ -1,0 +1,77 @@
+name: TestDriver.ai
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gather-markdown-files:
+    name: Gather Markdown Files
+    runs-on: ubuntu-latest
+    outputs:
+      markdown_files: ${{ steps.markdown_list.outputs.files }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Find all markdown files and extract filenames
+        id: markdown_list
+        run: |
+          FILES=$(ls ./testdriver/.generate/*.md)
+          FILENAMES=$(basename -a $FILES)
+          FILES_JSON=$(echo "$FILENAMES" | jq -R -s -c 'split("\n")[:-1]')
+          echo "::set-output name=files::$FILES_JSON"
+
+  test:
+    needs: gather-markdown-files
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        markdown: ${{ fromJson(needs.gather-markdown-files.outputs.markdown_files) }}
+      fail-fast: false
+    name: ${{ matrix.markdown }}  # Using just the filename
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Display filename being tested
+        run: |
+          echo "Running job for file: ${{ matrix.markdown }}"
+
+      - name: Read file content into environment variable
+        id: read_file
+        run: |
+          CONTENT=$(cat ./testdriver/.generate/${{ matrix.markdown }})
+          echo "MARKDOWN_CONTENT<<EOF" >> $GITHUB_ENV
+          echo "$CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - uses: testdriverai/action@main
+        with:
+          key: ${{ secrets.TESTDRIVER_API_KEY }}
+          prompt: ${{ env.MARKDOWN_CONTENT }}  # Use the content of the file from the environment
+          prerun: |
+            # URL for the Arc browser installer
+            $installerUrl = "https://releases.arc.net/windows/ArcInstaller.exe"
+
+            # Location to save the installer
+            $installerPath = "$env:USERPROFILE\Downloads\ArcInstaller.exe"
+
+            # Download the Arc browser installer
+            Write-Host "Downloading Arc browser installer..."
+            Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+
+            # Check if the download was successful
+            if (Test-Path $installerPath) {
+                Write-Host "Download successful. Running the installer..."
+                Start-Process -FilePath $installerPath -ArgumentList '/silent' -Wait
+                Start-Sleep -Seconds 10
+            } else {
+                Write-Host "Failed to download the Arc browser installer."
+            }
+    
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE_COLOR: "3"
