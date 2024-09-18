@@ -37,11 +37,21 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Find and Replace
-        uses: jacobtomlinson/gha-find-replace@v3
+        uses: richardrigutins/replace-in-files@v2
         with:
-          find: "placeholder@testdriver.ai"
-          replace: "${{ github.run_id }}-${{ github.run_attempt }}"
-          regex: false
+          files: '**/*.yml'
+          search-text: 'placeholder@testdriver.ai'
+          replacement-text: '${{ github.run_id }}-${{ github.run_attempt }}@testdriver.ai'
+          exclude: 'node_modules/**'
+          encoding: 'utf8'
+          max-parallelism: 10
+      
+      - name: Read and output the file contents
+        run: |
+          cat testdriver/onboarding.yml
+      - name: Read and output the file contents
+        run: |
+          cat ./testdriver/onboarding.yml
 
       - name: Display filename being tested
         run: |
