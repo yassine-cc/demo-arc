@@ -73,7 +73,7 @@ jobs:
             }
             
             # Replace placeholder email with generated
-            (gc ./testdriver/onboarding.yml) -replace "placeholder@testdriver.ai", '${{ github.run_id }}-${{ github.run_attempt }}@testdriver.ai' | sc ./testdriver/onboarding.yml
+            (gc ./testdriver/onboarding.yml) -replace "placeholder@testdriver.ai", '${{ github.run_id }}-${{ github.run_attempt }}@testdriver.ai' | sc -Force ./testdriver/onboarding.yml
     
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
