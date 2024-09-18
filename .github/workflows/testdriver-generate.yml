@@ -19,7 +19,7 @@ jobs:
       - name: Find all markdown files and extract filenames
         id: markdown_list
         run: |
-          FILES=$(ls ./testdriver/.generate/*.md)
+          FILES=$(ls ./testdriver/generate/*.md)
           FILENAMES=$(basename -a $FILES)
           FILES_JSON=$(echo "$FILENAMES" | jq -R -s -c 'split("\n")[:-1]')
           echo "::set-output name=files::$FILES_JSON"
@@ -43,7 +43,7 @@ jobs:
       - name: Read file content into environment variable
         id: read_file
         run: |
-          CONTENT=$(cat ./testdriver.generate/${{ matrix.markdown }})
+          CONTENT=$(cat ./testdriver/generate/${{ matrix.markdown }})
           echo "MARKDOWN_CONTENT<<EOF" >> $GITHUB_ENV
           echo "$CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
