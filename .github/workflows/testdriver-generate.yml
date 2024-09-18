@@ -50,6 +50,7 @@ jobs:
 
       - uses: testdriverai/action@main
         with:
+          branch: yassine/run-highest-privileges
           key: ${{ secrets.TESTDRIVER_API_KEY }}
           prompt: ${{ env.MARKDOWN_CONTENT }}  # Use the content of the file from the environment
           prerun: |
