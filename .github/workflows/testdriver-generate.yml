@@ -35,23 +35,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-      
-      - name: Find and Replace
-        uses: richardrigutins/replace-in-files@v2
-        with:
-          files: '**/*.yml'
-          search-text: 'placeholder@testdriver.ai'
-          replacement-text: '${{ github.run_id }}-${{ github.run_attempt }}@testdriver.ai'
-          exclude: 'node_modules/**'
-          encoding: 'utf8'
-          max-parallelism: 10
-      
-      - name: Read and output the file contents
-        run: |
-          cat testdriver/onboarding.yml
-      - name: Read and output the file contents
-        run: |
-          cat ./testdriver/onboarding.yml
 
       - name: Display filename being tested
         run: |
@@ -60,7 +43,7 @@ jobs:
       - name: Read file content into environment variable
         id: read_file
         run: |
-          CONTENT=$(cat ./testdriver/.generate/${{ matrix.markdown }})
+          CONTENT=$(cat ./testdriver.generate/${{ matrix.markdown }})
           echo "MARKDOWN_CONTENT<<EOF" >> $GITHUB_ENV
           echo "$CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -88,6 +71,9 @@ jobs:
             } else {
                 Write-Host "Failed to download the Arc browser installer."
             }
+            
+            # Replace placeholder email with generated
+            (gc ./testdriver/onboarding.yml) -replace "placeholder@testdriver.ai", '${{ github.run_id }}-${{ github.run_attempt }}@testdriver.ai' | sc ./testdriver/onboarding.yml
     
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
