@@ -7,39 +7,46 @@ steps:
       - command: hover-image
         description: right arrow button in the Arc browser
         action: click
+        method: turbo
   - prompt: fill out this form with fake information
     commands:
       - command: hover-text
         text: Name
         description: name field in the form
         action: click
+        method: turbo
       - command: type
         text: John Doe
       - command: hover-text
         text: Email
         description: email field in the form
         action: click
+        method: turbo
       - command: type
         text: placeholder@testdriver.ai
       - command: hover-text
         text: Password
         description: password field in the form
         action: click
+        method: turbo
       - command: type
         text: FakePassword123
       - command: hover-text
         text: Confirm Password
         description: confirm password field in the form
         action: click
+        method: turbo
       - command: type
         text: FakePassword123
       - command: match-image
         path: tos.png
         action: click
+        method: turbo
       - command: hover-text
         text: Create an Account
         description: create an account button
         action: click
+        method: turbo
   - prompt: click on "no, i want to type"
     commands:
       - command: focus-application
@@ -48,12 +55,14 @@ steps:
         text: No, I want to type
         description: option to type in all passwords again
         action: click
+        method: turbo
   - prompt: click on "no, i want to type"
     commands:
       - command: hover-text
         text: No, I want to type in all my passwords again
         description: option to type passwords manually
         action: click
+        method: turbo
   - prompt: click next
     commands:
       - command: focus-application
@@ -62,6 +71,7 @@ steps:
         text: Next
         description: button to proceed
         action: click
+        method: turbo
   - prompt: enable arc max
     commands:
       - command: focus-application
@@ -70,6 +80,7 @@ steps:
         text: Enable Arc Max
         description: button to enable Arc Max
         action: click
+        method: turbo
   - prompt: click next
     commands:
       - command: focus-application
@@ -78,6 +89,7 @@ steps:
         text: Next
         description: button to proceed
         action: click
+        method: turbo
   - prompt: click next
     commands:
       - command: assert
@@ -94,6 +106,7 @@ steps:
         text: Get Started
         description: button to get started in Arc
         action: click
+        method: turbo
   - prompt: click get started
     commands:
       - command: assert
