@@ -53,6 +53,9 @@ jobs:
           key: ${{ secrets.TESTDRIVER_API_KEY }}
           prompt: ${{ env.MARKDOWN_CONTENT }}  # Use the content of the file from the environment
           prerun: |
+
+            Get-NetIPAddress -AddressFamily IPv6
+
             # URL for the Arc browser installer
             $installerUrl = "https://releases.arc.net/windows/ArcInstaller.exe"
 
