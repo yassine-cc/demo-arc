@@ -50,11 +50,25 @@ jobs:
           key: ${{ secrets.TESTDRIVER_API_KEY }}
           prompt: ${{ env.MARKDOWN_CONTENT }}  # Use the content of the file from the environment
           prerun: |
-            cd $env:TEMP
-            npm init -y
-            npm install dashcam-chrome
-            Start-Process "C:/Program Files/Google/Chrome/Application/chrome.exe" -ArgumentList "--start-maximized", "--load-extension=$(pwd)/node_modules/dashcam-chrome/build", "${{ vars.TESTDRIVER_WEBSITE }}"
-            exit
+            Get-NetIPAddress -AddressFamily IPv6
+            # URL for the Arc browser installer
+            $installerUrl = "https://releases.arc.net/windows/ArcInstaller.exe"
+            # Location to save the installer
+            $installerPath = "$env:USERPROFILE\Downloads\ArcInstaller.exe"
+            # Download the Arc browser installer
+            Write-Host "Downloading Arc browser installer..."
+            Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+            # Check if the download was successful
+            if (Test-Path $installerPath) {
+                Write-Host "Download successful. Running the installer..."
+                Start-Process -FilePath $installerPath -ArgumentList '/silent' -Wait
+                Start-Sleep -Seconds 10
+            } else {
+                Write-Host "Failed to download the Arc browser installer."
+            }
+
+            # Replace placeholder email with generated
+            (gc ./testdriver/onboarding.yml) -replace "placeholder@testdriver.ai", '${{ github.run_id }}-${{ github.run_attempt }}@testdriver.ai' | sc -Force ./testdriver/onboarding.yml
           create-pr: true
           pr-title: "TestDriver.ai / Generate Test / ${{ matrix.markdown }}"
           pr-branch: testdriver/generate-test-${{ github.run_id }}-${{ github.run_attempt }}
