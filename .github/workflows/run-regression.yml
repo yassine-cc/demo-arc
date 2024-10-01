@@ -1,0 +1,55 @@
+name: TestDriver.ai / Regression
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  gather-test-files:
+    name: Gather Test Files
+    runs-on: ubuntu-latest
+    outputs:
+      test_files: ${{ steps.test_list.outputs.files }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Find all test files and extract filenames
+        id: test_list
+        run: |
+          FILES=$(ls ./testdriver/*.yml)
+          FILENAMES=$(basename -a $FILES)
+          FILES_JSON=$(echo "$FILENAMES" | jq -R -s -c 'split("\n")[:-1]')
+          echo "::set-output name=files::$FILES_JSON"
+
+  test:
+    needs: gather-test-files
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test: ${{ fromJson(needs.gather-test-files.outputs.test_files) }}
+      fail-fast: true
+    name: ${{ matrix.test }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Display filename being tested
+        run: |
+          echo "Running job for file: ${{ matrix.test }}"
+      
+      - uses: testdriverai/action@main
+        with:
+          key: ${{ secrets.TESTDRIVER_API_KEY }}
+          prompt: 1. /run testdriver/${{ matrix.test }} 
+          prerun: |
+            cd $env:TEMP
+            npm init -y
+            npm install dashcam-chrome
+            Start-Process "C:/Program Files/Google/Chrome/Application/chrome.exe" -ArgumentList "--start-maximized", "--load-extension=$(pwd)/node_modules/dashcam-chrome/build", "${{ env.WEBSITE_URL }}"
+            exit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE_COLOR: "3"
+          WEBSITE_URL: "https://pubnub.com"

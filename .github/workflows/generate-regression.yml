@@ -1,9 +1,6 @@
-name: TestDriver.ai
+name: TestDriver.ai / Generate / Regression
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -20,7 +17,7 @@ jobs:
         id: markdown_list
         run: |
           FILES=$(ls ./testdriver/generate/*.md)
-          FILENAMES=$(basename -a $FILES)
+          FILENAMES=$(basename -a $FILES | sed 's/\.md$//')
           FILES_JSON=$(echo "$FILENAMES" | jq -R -s -c 'split("\n")[:-1]')
           echo "::set-output name=files::$FILES_JSON"
 
@@ -38,46 +35,29 @@ jobs:
 
       - name: Display filename being tested
         run: |
-          echo "Running job for file: ${{ matrix.markdown }}"
+          echo "Running job for file: ${{ matrix.markdown }}.md"
 
       - name: Read file content into environment variable
         id: read_file
         run: |
-          CONTENT=$(cat ./testdriver/generate/${{ matrix.markdown }})
+          CONTENT=$(cat ./testdriver/generate/${{ matrix.markdown }}.md)
           echo "MARKDOWN_CONTENT<<EOF" >> $GITHUB_ENV
           echo "$CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-
+      
       - uses: testdriverai/action@main
         with:
           key: ${{ secrets.TESTDRIVER_API_KEY }}
           prompt: ${{ env.MARKDOWN_CONTENT }}  # Use the content of the file from the environment
           prerun: |
-
-            Get-NetIPAddress -AddressFamily IPv6
-
-            # URL for the Arc browser installer
-            $installerUrl = "https://releases.arc.net/windows/ArcInstaller.exe"
-
-            # Location to save the installer
-            $installerPath = "$env:USERPROFILE\Downloads\ArcInstaller.exe"
-
-            # Download the Arc browser installer
-            Write-Host "Downloading Arc browser installer..."
-            Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
-
-            # Check if the download was successful
-            if (Test-Path $installerPath) {
-                Write-Host "Download successful. Running the installer..."
-                Start-Process -FilePath $installerPath -ArgumentList '/silent' -Wait
-                Start-Sleep -Seconds 10
-            } else {
-                Write-Host "Failed to download the Arc browser installer."
-            }
-            
-            # Replace placeholder email with generated
-            (gc ./testdriver/onboarding.yml) -replace "placeholder@testdriver.ai", '${{ github.run_id }}-${{ github.run_attempt }}@testdriver.ai' | sc -Force ./testdriver/onboarding.yml
-    
+            cd $env:TEMP
+            npm init -y
+            npm install dashcam-chrome
+            Start-Process "C:/Program Files/Google/Chrome/Application/chrome.exe" -ArgumentList "--start-maximized", "--load-extension=$(pwd)/node_modules/dashcam-chrome/build", "${{ vars.TESTDRIVER_WEBSITE }}"
+            exit
+          create-pr: true
+          pr-title: "TestDriver.ai / Generate Test / ${{ matrix.markdown }}"
+          pr-branch: testdriver/generate-test-${{ github.run_id }}-${{ github.run_attempt }}
+          pr-test-filename: ${{matrix.markdown}}.yml
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FORCE_COLOR: "3"
